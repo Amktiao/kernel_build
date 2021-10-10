@@ -21,7 +21,7 @@ jobs:
           VERSION="$(cat msm-4.14/arch/arm64/configs/${BOARD}_defconfig | grep "CONFIG_LOCALVERSION\=" | sed -r 's/.*"(.+)".*/\1/' | sed 's/^.//')"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           git clone https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 --depth=1
-          mv linux-x86/clang-r428724 clang
+          mv linux-x86/clang-r433403 clang
           rm -rf linux-x86
           git clone --depth=1 https://github.com/zclkkk/AnyKernel3 -b main
       - name: 构建内核
