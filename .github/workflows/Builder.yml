@@ -24,6 +24,8 @@ jobs:
           mv linux-x86/clang-r428724 clang
           rm -rf linux-x86
           git clone --depth=1 https://github.com/zclkkk/AnyKernel3 -b main
+          pwd
+          ls
       - name: 构建内核
         run: |
           export KBUILD_BUILD_USER="zclkkk"
