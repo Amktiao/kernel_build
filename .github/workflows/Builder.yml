@@ -17,6 +17,7 @@ jobs:
           curl -sL https://git.io/file-transfer | bash -s beta
       - name: 拉取源代码和工具链
         run: |
+          pwd
           git clone https://oauth2:${{ secrets.TOKEN }}@github.com/zclkkk/kernel_xiaomi_sm8150.git msm-4.14 --depth=1 -b main
           VERSION="$(cat msm-4.14/arch/arm64/configs/${BOARD}_defconfig | grep "CONFIG_LOCALVERSION\=" | sed -r 's/.*"(.+)".*/\1/' | sed 's/^.//')"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
