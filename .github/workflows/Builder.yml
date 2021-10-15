@@ -29,19 +29,20 @@ jobs:
           export KBUILD_BUILD_USER="zclkkk"
           export KBUILD_BUILD_HOST="Server"
           export PATH=/home/runner/work/clang/bin:${PATH}
+          ls /home/runner/work/clang/bin
           args="                  ARCH=arm64 \
                                   O=../out \
-                                  CC=clang \
-                                  AR=llvm-ar \
-                                  NM=llvm-nm \
-                                  OBJCOPY=llvm-objcopy \
-                                  OBJDUMP=llvm-objdump \
-                                  STRIP=llvm-strip \
-                                  LD=ld.lld \
-                                  HOSTCC=clang \
-                                  HOSTLD=ld.lld \
-                                  HOSTAR=llvm-ar \
-                                  HOSTCXX=clang++ \
+                                  CC=/home/runner/work/clang/bin/clang \
+                                  AR=/home/runner/work/clang/bin/llvm-ar \
+                                  NM=/home/runner/work/clang/bin/llvm-nm \
+                                  OBJCOPY=/home/runner/work/clang/bin/llvm-objcopy \
+                                  OBJDUMP=/home/runner/work/clang/bin/llvm-objdump \
+                                  STRIP=/home/runner/work/clang/bin/llvm-strip \
+                                  LD=/home/runner/work/clang/bin/ld.lld \
+                                  HOSTCC=/home/runner/work/clang/bin/clang \
+                                  HOSTLD=/home/runner/work/clang/bin/ld.lld \
+                                  HOSTAR=/home/runner/work/clang/bin/llvm-ar \
+                                  HOSTCXX=/home/runner/work/clang/bin/clang++ \
                                   CLANG_TRIPLE=aarch64-linux-gnu- \
                                   CROSS_COMPILE=aarch64-linux-gnu- \
                                   CROSS_COMPILE_ARM32=arm-linux-gnueabi- "
