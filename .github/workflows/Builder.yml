@@ -21,17 +21,30 @@ jobs:
           VERSION="$(cat msm-4.14/arch/arm64/configs/${BOARD}_defconfig | grep "CONFIG_LOCALVERSION\=" | sed -r 's/.*"(.+)".*/\1/' | sed 's/^.//')"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           git clone https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 --depth=1
-          mv linux-x86/clang-r428724 clang
+          mv linux-x86/clang-r433403 clang
           rm -rf linux-x86
           git clone --depth=1 https://github.com/zclkkk/AnyKernel3 -b main
-          pwd
-          ls
       - name: 构建内核
         run: |
           export KBUILD_BUILD_USER="zclkkk"
           export KBUILD_BUILD_HOST="Server"
-          pwd
-          args="O=../out ARCH=arm64 CC=../clang/bin/clang CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi-"
+          export PATH=/home/runner/work/kernel_build/kernel_build/clang/bin:${PATH}
+          args="                  ARCH=arm64 \
+                                  O=../out \
+                                  CC=clang \
+                                  AR=llvm-ar \
+                                  NM=llvm-nm \
+                                  OBJCOPY=llvm-objcopy \
+                                  OBJDUMP=llvm-objdump \
+                                  STRIP=llvm-strip \
+                                  LD=ld.lld \
+                                  HOSTCC=clang \
+                                  HOSTLD=ld.lld \
+                                  HOSTAR=llvm-ar \
+                                  HOSTCXX=clang++ \
+                                  CLANG_TRIPLE=aarch64-linux-gnu- \
+                                  CROSS_COMPILE=aarch64-linux-gnu- \
+                                  CROSS_COMPILE_ARM32=arm-linux-gnueabi- "
           cd msm-4.14
           make ${args} ${BOARD}_defconfig
           make -j64 ${args}
