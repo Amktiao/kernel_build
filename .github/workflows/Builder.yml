@@ -12,20 +12,17 @@ jobs:
         run: |
           sudo apt update -y
           sudo apt-get install -y zip zipalign bc build-essential zip gcc clang libc6 curl libstdc++6 git wget libssl-dev cpio
-          BOARD=raphael
-          echo "BOARD=$BOARD" >> $GITHUB_ENV
           curl -sL https://git.io/file-transfer | bash -s beta
       - name: 拉取源代码和工具链
         run: |
           git clone https://oauth2:${{ secrets.TOKEN }}@github.com/zclkkk/kernel_xiaomi_sm8150.git msm-4.14 --depth=1 -b main
-          VERSION="$(cat msm-4.14/arch/arm64/configs/${BOARD}_defconfig | grep "CONFIG_LOCALVERSION\=" | sed -r 's/.*"(.+)".*/\1/' | sed 's/^.//')"
+          VERSION="$(cat msm-4.14/arch/arm64/configs/raphael_defconfig | grep "CONFIG_LOCALVERSION\=" | sed -r 's/.*"(.+)".*/\1/' | sed 's/^.//')"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           git clone https://zclkkk@bitbucket.org/zclkkk/clang.git
           cd clang
           rm -rf .git
           cd ..
-          git clone --depth=1 https://github.com/zclkkk/AnyKernel3 -b main
-      - name: 构建内核
+      - name: 构建内核 - Raphael
         run: |
           export KBUILD_BUILD_USER="zclkkk"
           export KBUILD_BUILD_HOST="Server"
@@ -47,23 +44,59 @@ jobs:
                                   CROSS_COMPILE=aarch64-linux-gnu- \
                                   CROSS_COMPILE_ARM32=arm-linux-gnueabi- "
           cd msm-4.14
-          make ${args} ${BOARD}_defconfig
+          make ${args} raphael_defconfig
           make -j64 ${args}
-        env:
-           BOARD: ${{ env.BOARD }}
-      - name: 打包内核
+      - name: 打包内核 - Raphael
         run: |
+          git clone --depth=1 https://github.com/zclkkk/AnyKernel3 -b main
           cp out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
           cp out/arch/arm64/boot/dtbo.img AnyKernel3/
           cd AnyKernel3
           7z a -mx9 ${VERSION}.zip *
-          zipalign -v 4 ${VERSION}.zip ../${VERSION}_${BOARD}.zip
+          zipalign -v 4 ${VERSION}.zip ../${VERSION}_raphael.zip
+          cd ..
+          rm -rf out AnyKernel3
         env:
-           BOARD: ${{ env.BOARD }}
+           VERSION: ${{ env.VERSION }}
+      - name: 构建内核 - Cepheus
+        run: |
+          export KBUILD_BUILD_USER="zclkkk"
+          export KBUILD_BUILD_HOST="Server"
+          export PATH=/home/runner/work/kernel_build/kernel_build/clang/bin:${PATH}
+          args="                  ARCH=arm64 \
+                                  O=../out \
+                                  CC=clang \
+                                  AR=llvm-ar \
+                                  NM=llvm-nm \
+                                  OBJCOPY=llvm-objcopy \
+                                  OBJDUMP=llvm-objdump \
+                                  STRIP=llvm-strip \
+                                  LD=ld.lld \
+                                  HOSTCC=clang \
+                                  HOSTLD=ld.lld \
+                                  HOSTAR=llvm-ar \
+                                  HOSTCXX=clang++ \
+                                  CLANG_TRIPLE=aarch64-linux-gnu- \
+                                  CROSS_COMPILE=aarch64-linux-gnu- \
+                                  CROSS_COMPILE_ARM32=arm-linux-gnueabi- "
+          cd msm-4.14
+          make ${args} cepheus_defconfig
+          make -j64 ${args}
+      - name: 打包内核 - Cepheus
+        run: |
+          git clone --depth=1 https://github.com/zclkkk/AnyKernel3 -b main
+          cp out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
+          cp out/arch/arm64/boot/dtbo.img AnyKernel3/
+          cd AnyKernel3
+          7z a -mx9 ${VERSION}.zip *
+          zipalign -v 4 ${VERSION}.zip ../${VERSION}_cepheus.zip
+          cd ..
+          rm -rf out AnyKernel3
+        env:
            VERSION: ${{ env.VERSION }}
       - name: 上传内核
         run: |
-          ./transfer trs ${VERSION}_${BOARD}.zip
+          ./transfer trs ${VERSION}_cepheus.zip
+          ./transfer trs ${VERSION}_raphael.zip
         env:
-           BOARD: ${{ env.BOARD }}
            VERSION: ${{ env.VERSION }}
