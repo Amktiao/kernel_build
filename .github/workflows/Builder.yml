@@ -11,14 +11,15 @@ jobs:
       - name: 环境准备
         run: |
           sudo apt update -y
-          sudo apt-get install -y zip zipalign bc build-essential zip gcc clang libc6 curl libstdc++6 git wget libssl-dev cpio
+          sudo apt-get install -y zip zipalign bc build-essential zip gcc clang libc6 curl libstdc++6 git wget libssl-dev cpio tar
           curl -sL https://git.io/file-transfer | bash -s beta
       - name: 拉取源代码和工具链
         run: |
           git clone https://github.com/zclkkk/kernel_xiaomi_sm8150.git msm-4.14 --depth=1 -b main
           VERSION="$(cat msm-4.14/arch/arm64/configs/raphael_defconfig | grep "CONFIG_LOCALVERSION\=" | sed -r 's/.*"(.+)".*/\1/' | sed 's/^.//')"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          git clone https://zclkkk@bitbucket.org/zclkkk/clang.git
+          wget https://gitea.com/Mandi-Sa/clang/archive/20211022.tar.gz
+          tar -xzvf 20211022.tar.gz
           cd clang
           rm -rf .git
           cd ..
